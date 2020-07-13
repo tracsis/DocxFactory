@@ -32,7 +32,7 @@
 
 using namespace DocxFactory;
 using namespace std;
-
+using namespace icu;
 
 
 // static data members definition
@@ -2773,7 +2773,7 @@ string LocaleFunc::dateTimeToStrSub(
 				switch ( l_entryLen )
 				{
 					case 3:
-						l_str		= StrFunc::intToStr( ( abs( p_timeZone ) - abs( p_timeZone ) % 60 ) % 24 );
+						l_str		= StrFunc::intToStr( ( static_cast<int>(abs( p_timeZone )) - static_cast<int>(abs( p_timeZone )) % 60 ) % 24 );
 						l_str		= ( l_str.length() < 2 ? '0' + l_str : l_str );
 
 						l_result	+= ( p_timeZone < 0 ? "-" : "+" ) + l_str;
@@ -2783,8 +2783,8 @@ string LocaleFunc::dateTimeToStrSub(
 					case 5: 
 					case 6: 
 
-						i =	abs( p_timeZone ) % 60;
-						j = ( abs( p_timeZone ) - i ) % 24;
+						i =	static_cast<int>(abs( p_timeZone )) % 60;
+						j = static_cast<int>( abs( p_timeZone ) - i ) % 24;
 
 						l_str		= StrFunc::intToStr( j );
 						l_str		= ( l_str.length() < 2 ? '0' + l_str : l_str );
