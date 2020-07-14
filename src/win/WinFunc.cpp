@@ -16,8 +16,8 @@
 #include <cstdlib>
 #include <cstdio>
 #include <iostream>
-#include <Windows.h>
-#include <ShlObj.h>
+#include <windows.h>
+#include <shlobj.h>
 #include <direct.h>
 
 using namespace DocxFactory;
