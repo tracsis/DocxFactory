@@ -2,8 +2,10 @@
 #ifndef __DOCXFACTORY_FILE_INFO_H__
 #define __DOCXFACTORY_FILE_INFO_H__
 
-#include "zlib/zip.h"
-#include "zlib/unzip.h"
+#include <boost/cstdint.hpp>
+
+#include <zip.h>
+#include <unzip.h>
 
 
 

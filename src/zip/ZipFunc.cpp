@@ -159,12 +159,12 @@ tm_zip ZipFunc::getLocalTime( time_t p_time )
 	tm_zip	l_retVal;
 	tm*		l_tm	= localtime( &p_time );
 
-	l_retVal.tm_hour	= ( uInt ) l_tm ->tm_hour;
-	l_retVal.tm_mday	= ( uInt ) l_tm ->tm_mday;
-	l_retVal.tm_min		= ( uInt ) l_tm ->tm_min;
-	l_retVal.tm_mon		= ( uInt ) l_tm ->tm_mon;
-	l_retVal.tm_sec		= ( uInt ) l_tm ->tm_sec;
-	l_retVal.tm_year	= ( uInt ) l_tm ->tm_year;
+	l_retVal.tm_hour	= ( unsigned int ) l_tm ->tm_hour;
+	l_retVal.tm_mday	= ( unsigned int ) l_tm ->tm_mday;
+	l_retVal.tm_min		= ( unsigned int ) l_tm ->tm_min;
+	l_retVal.tm_mon		= ( unsigned int ) l_tm ->tm_mon;
+	l_retVal.tm_sec		= ( unsigned int ) l_tm ->tm_sec;
+	l_retVal.tm_year	= ( unsigned int ) l_tm ->tm_year;
 
 	return l_retVal;
 } // getLocalTime

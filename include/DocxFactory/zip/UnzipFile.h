@@ -5,10 +5,10 @@
 #include "DocxFactory/zip/ZipFunc.h"
 #include "DocxFactory/util/DocxFactoryDefs.h"
 
-#include "zlib/unzip.h"
+#include <unzip.h>
 
-#include "boost/type_traits.hpp"
-#include "boost/utility/enable_if.hpp"
+#include <boost/type_traits.hpp>
+#include <boost/utility/enable_if.hpp>
 
 #include <map>
 #include <string>

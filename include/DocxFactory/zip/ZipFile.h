@@ -2,14 +2,16 @@
 #ifndef __DOCXFACTORY_ZIP_FILE_H__
 #define __DOCXFACTORY_ZIP_FILE_H__
 
+#include <boost/cstdint.hpp>
 #include "DocxFactory/zip/ZipFunc.h"
 #include "DocxFactory/util/DocxFactoryDefs.h"
 
-#include "zlib/zip.h"
-#include "zlib/unzip.h"
+#include <zip.h>
+#include <unzip.h>
+#include <zlib.h>
 
-#include "boost/type_traits.hpp"
-#include "boost/utility/enable_if.hpp"
+#include <boost/type_traits.hpp>
+#include <boost/utility/enable_if.hpp>
 
 #include <map>
 #include <string>

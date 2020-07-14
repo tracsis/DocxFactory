@@ -4,7 +4,7 @@
 
 #include "DocxFactory/util/DocxFactoryDefs.h"
 
-#include "zlib/zip.h"
+#include <zip.h>
 
 #include <string>
 #include <ctime>
