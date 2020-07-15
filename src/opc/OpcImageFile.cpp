@@ -11,7 +11,7 @@
 #include "DocxFactory/str/StrFunc.h"
 #include "DocxFactory/util/DocxFactoryDefs.h"
 
-#include "zlib/zip.h"
+#include <zip.h>
 
 #include "Magick++.h"
 #include "magick/image.h"

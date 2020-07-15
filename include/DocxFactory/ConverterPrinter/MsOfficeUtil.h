@@ -6,7 +6,7 @@
 #include "DocxFactory/ConverterPrinter/OleException.h"
 
 #include <map>
-#include <Windows.h>
+#include <windows.h>
 
 #define THROW_IF_FAILED( result, exception ) \
 	if ( FAILED( result ) ) \

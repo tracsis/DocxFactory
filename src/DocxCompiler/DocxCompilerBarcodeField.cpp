@@ -14,7 +14,7 @@
 #include "DocxFactory/str/StrFunc.h"
 #include "DocxFactory/util/DocxFactoryDefs.h"
 
-#include "zint/zint.h"
+#include "zint.h"
 
 #include "xercesc/dom/DOM.hpp"
 

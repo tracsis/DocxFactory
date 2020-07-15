@@ -1,7 +1,7 @@
 
-#include "WordProcessingMerger.h"
+#include "DocxFactory/WordProcessingMerger/WordProcessingMerger.h"
 
-#include "dfw.h"
+#include "DocxFactory/WordProcessingMerger/dfw.h"
 
 #include <stdexcept>
 

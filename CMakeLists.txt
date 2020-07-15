@@ -4,13 +4,12 @@ cmake_minimum_required(VERSION 3.6)
 set(CMAKE_CXX_STANDARD 11)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-find_package(PkgConfig REQUIRED)
 
-# find_package(ICU REQUIRED i18n io le lx uc)
-find_package(ICU COMPONENTS i18n io le lx uc)
+find_package(PkgConfig REQUIRED)
+find_package(ICU REQUIRED i18n io le lx uc)
 find_package(Boost REQUIRED)
 find_package(ZLIB REQUIRED)
-find_package(ImageMagick)
+find_package(ImageMagick REQUIRED Magick++)
 find_package(PkgConfig REQUIRED)
 find_package(XercesC REQUIRED)
 pkg_check_modules(MiniZip REQUIRED minizip)
@@ -24,21 +23,21 @@ if(NOT LIBREOFFICE_SDK_PATH)
 	endif(WIN32)
 endif(NOT LIBREOFFICE_SDK_PATH)
 
-set(LIBREOFFICE_SDK_INCLUDE_DIRS "/opt/libreoffice6.4/sdk/include_generated" ${LIBREOFFICE_SDK_PATH}/include)
+set(LIBREOFFICE_SDK_INCLUDE_DIRS ${LIBREOFFICE_SDK_PATH}/include_generated ${LIBREOFFICE_SDK_PATH}/include)
 set(LIBREOFFICE_SDK_LIB_DIRS ${LIBREOFFICE_SDK_PATH}/lib)
-if(WIN32)	
+if(WIN32)
 	set(LIBREOFFICE_SDK_LIBRARIES
-		-l${LIBREOFFICE_SDK_LIB_DIRS}/icppu.lib
-		-l${LIBREOFFICE_SDK_LIB_DIRS}/icppuhelper.lib
-		-l${LIBREOFFICE_SDK_LIB_DIRS}/isal.lib
-		-l${LIBREOFFICE_SDK_LIB_DIRS}/isalhelper.lib
+		${LIBREOFFICE_SDK_LIB_DIRS}/icppu.lib
+		${LIBREOFFICE_SDK_LIB_DIRS}/icppuhelper.lib
+		${LIBREOFFICE_SDK_LIB_DIRS}/isal.lib
+		${LIBREOFFICE_SDK_LIB_DIRS}/isalhelper.lib
 	)
 else(WIN32)
 	set(LIBREOFFICE_SDK_LIBRARIES
-		-l${LIBREOFFICE_SDK_LIB_DIRS}/libuno_cppu.so
-		-l${LIBREOFFICE_SDK_LIB_DIRS}/libuno_cppuhelpergcc3.so
-		-l${LIBREOFFICE_SDK_LIB_DIRS}/libuno_sal.so
-		-l${LIBREOFFICE_SDK_LIB_DIRS}/libuno_salhelpergcc3.so
+		${LIBREOFFICE_SDK_LIB_DIRS}/libuno_cppu.so
+		${LIBREOFFICE_SDK_LIB_DIRS}/libuno_cppuhelpergcc3.so
+		${LIBREOFFICE_SDK_LIB_DIRS}/libuno_sal.so
+		${LIBREOFFICE_SDK_LIB_DIRS}/libuno_salhelpergcc3.so
 	)
 endif(WIN32)
 
@@ -49,15 +48,18 @@ include_directories(
 	${BOOST_INCLUDE_DIRS}
 	${ZLIB_INCLUDE_DIRS}
 	${ImageMagick_INCLUDE_DIRS}
+	${ImageMagick_Magick++_INCLUDE_DIRS}
 	${XercesC_INCLUDE_DIRS}
 	${MiniZip_INCLUDE_DIRS}
-	${Zint_INCLUDE_DIR}
+	${ZINT_INCLUDE_DIR}
 	${LIBREOFFICE_SDK_INCLUDE_DIRS}
 )
 
-set(PLATFORM_UTIL ${CMAKE_SOURCE_DIR}/src/unix/UnixFunc.cpp)
+
 if(WIN32)
 	set(PLATFORM_UTIL ${CMAKE_SOURCE_DIR}/src/win/WinFunc.cpp)
+else(WIN32)
+	set(PLATFORM_UTIL ${CMAKE_SOURCE_DIR}/src/unix/UnixFunc.cpp)
 endif(WIN32)
 add_library(libDocxFactoryLib STATIC
 	${CMAKE_SOURCE_DIR}/src/barcode/BarcodeFunc.cpp
@@ -144,15 +146,17 @@ add_library(libDocxFactoryLib STATIC
 	${PLATFORM_UTIL}
 )
 target_link_libraries(libDocxFactoryLib
-	${ICU_LINK_LIBRARIES}
-	${ZLIB_LINK_LIBRARIES}
-	${ImageMagick_LINK_LIBRARIES}
-	${XercesC_LINK_LIBRARIES}
-	${MiniZip_LINK_LIBRARIES}
-	${Zint_LIBRARIES}
+	${ICU_LIBRARIES}
+	${ZLIB_LIBRARIES}
+	${ImageMagick_LIBRARIES}
+	${ImageMagick_Magick++_LIBRARIES}
+	${XercesC_LIBRARIES}
+	${MiniZip_LIBRARIES}
+	${ZINT_LIBRARIES}
 )
 
-add_library(libUnoUtil SHARED
+
+add_library(libUnoUtil STATIC
 	${CMAKE_SOURCE_DIR}/src/UnoUtil/PropertyMap.cpp
 	${CMAKE_SOURCE_DIR}/src/UnoUtil/UnoException.cpp
 	${CMAKE_SOURCE_DIR}/src/UnoUtil/UnoUtilImpl.cpp
@@ -161,16 +165,22 @@ target_link_libraries(libUnoUtil
 	libDocxFactoryLib
 	${LIBREOFFICE_SDK_LIBRARIES}
 )
+if(UNIX)
+	target_compile_definitions(libUnoUtil PRIVATE LINUX)
+endif(UNIX)
 
+
+file(GLOB DOCXMERGER_SRC ${CMAKE_SOURCE_DIR}/src/DocxMerger/*.cpp)
+file(GLOB DOCXCOMPILER_SRC ${CMAKE_SOURCE_DIR}/src/DocxCompiler/*.cpp)
 add_library(libDocxFactory STATIC
 	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/ConversionNotSupportedException.cpp
 	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/ConverterPrinter.cpp
 	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/ConverterPrinterException.cpp
 	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/ExportFormatNotSupportedException.cpp
 	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/GradeGroup.cpp
-	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/MsExcelUtil.cpp
-	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/MsOfficeUtil.cpp
-	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/MsWordUtil.cpp
+	# ${CMAKE_SOURCE_DIR}/src/ConverterPrinter/MsExcelUtil.cpp
+	# ${CMAKE_SOURCE_DIR}/src/ConverterPrinter/MsOfficeUtil.cpp
+	# ${CMAKE_SOURCE_DIR}/src/ConverterPrinter/MsWordUtil.cpp
 	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/OdfConverterUtil.cpp
 	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/OleException.cpp
 	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/OpenOfficeUtil.cpp
@@ -191,6 +201,10 @@ add_library(libDocxFactory STATIC
 	${CMAKE_SOURCE_DIR}/src/opc/PartNotFoundException.cpp
 	${CMAKE_SOURCE_DIR}/src/opc/PartTypeNotFoundException.cpp
 
+	${DOCXMERGER_SRC}
+
+	${DOCXCOMPILER_SRC}
+
 	${CMAKE_SOURCE_DIR}/src/WordProcessingCompiler/dfwc.cpp
 	${CMAKE_SOURCE_DIR}/src/WordProcessingCompiler/WordProcessingCompiler.cpp
 
@@ -207,6 +221,12 @@ target_link_libraries(libDocxFactory
 	libDocxFactoryLib
 	libUnoUtil
 )
+if(MSVC)
+	target_compile_options(libDocxFactory PRIVATE /permissive)
+else()
+	target_compile_options(libDocxFactory PRIVATE -fpermissive)
+endif()
+
 
 add_executable(word-processing-compiler
 	${CMAKE_SOURCE_DIR}/src/WordProcessingCompiler/word-processing-compiler.cpp
@@ -214,6 +234,10 @@ add_executable(word-processing-compiler
 target_link_libraries(word-processing-compiler
 	libDocxFactory
 )
+if(CMAKE_DL_LIBS)
+	target_link_libraries(word-processing-compiler ${CMAKE_DL_LIBS})
+endif(CMAKE_DL_LIBS)
+
 
 add_executable(word-processing-merger
 	${CMAKE_SOURCE_DIR}/src/WordProcessingMerger/word-processing-merger.cpp
@@ -221,4 +245,6 @@ add_executable(word-processing-merger
 target_link_libraries(word-processing-merger
 	libDocxFactory
 )
-
+if(CMAKE_DL_LIBS)
+	target_link_libraries(word-processing-merger ${CMAKE_DL_LIBS})
+endif(CMAKE_DL_LIBS)
