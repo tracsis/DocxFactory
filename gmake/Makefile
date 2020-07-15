@@ -1,3 +1,5 @@
+# This Makefile probably won't work for you. Use CMake instead. See COMPILING.md
+
 PLATFORM=$(shell uname -m)
 FLAGS=-fpermissive -DNO_PNG
 BUILD_PATH=./../../build/Linux/$(PLATFORM)/DocxFactory

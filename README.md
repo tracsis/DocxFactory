@@ -1,3 +1,8 @@
+This is a fork of the DocxFactory Project, with compilation instructions and support for CMake. 
+Compilation on Ubuntu works, compilation on Windows is WIP
+
+---------------
+
 DocxFactory Project
 ===================
 

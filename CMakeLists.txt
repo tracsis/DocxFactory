@@ -18,9 +18,9 @@ find_package(Zint REQUIRED)
 if(NOT LIBREOFFICE_SDK_PATH)
 	if(WIN32)
 		set(LIBREOFFICE_SDK_PATH ${CMAKE_SOURCE_DIR}/libs/sdk)
-	else(WIN32)
+	else()
 		set(LIBREOFFICE_SDK_PATH "/opt/libreoffice6.4/sdk")	
-	endif(WIN32)
+	endif()
 endif(NOT LIBREOFFICE_SDK_PATH)
 
 set(LIBREOFFICE_SDK_INCLUDE_DIRS ${LIBREOFFICE_SDK_PATH}/include_generated ${LIBREOFFICE_SDK_PATH}/include)
@@ -32,14 +32,14 @@ if(WIN32)
 		${LIBREOFFICE_SDK_LIB_DIRS}/isal.lib
 		${LIBREOFFICE_SDK_LIB_DIRS}/isalhelper.lib
 	)
-else(WIN32)
+else()
 	set(LIBREOFFICE_SDK_LIBRARIES
 		${LIBREOFFICE_SDK_LIB_DIRS}/libuno_cppu.so
 		${LIBREOFFICE_SDK_LIB_DIRS}/libuno_cppuhelpergcc3.so
 		${LIBREOFFICE_SDK_LIB_DIRS}/libuno_sal.so
 		${LIBREOFFICE_SDK_LIB_DIRS}/libuno_salhelpergcc3.so
 	)
-endif(WIN32)
+endif()
 
 
 include_directories(
@@ -58,9 +58,9 @@ include_directories(
 
 if(WIN32)
 	set(PLATFORM_UTIL ${CMAKE_SOURCE_DIR}/src/win/WinFunc.cpp)
-else(WIN32)
+else()
 	set(PLATFORM_UTIL ${CMAKE_SOURCE_DIR}/src/unix/UnixFunc.cpp)
-endif(WIN32)
+endif()
 add_library(libDocxFactoryLib STATIC
 	${CMAKE_SOURCE_DIR}/src/barcode/BarcodeFunc.cpp
 
@@ -166,8 +166,9 @@ target_link_libraries(libUnoUtil
 	${LIBREOFFICE_SDK_LIBRARIES}
 )
 if(UNIX)
+	# This macro was used by the LibreOffice SDK, but wasn't defined by GCC
 	target_compile_definitions(libUnoUtil PRIVATE LINUX)
-endif(UNIX)
+endif()
 
 
 file(GLOB DOCXMERGER_SRC ${CMAKE_SOURCE_DIR}/src/DocxMerger/*.cpp)
