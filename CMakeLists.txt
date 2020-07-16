@@ -10,7 +10,6 @@ find_package(ICU REQUIRED i18n io le lx uc)
 find_package(Boost REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(ImageMagick REQUIRED Magick++)
-find_package(PkgConfig REQUIRED)
 find_package(XercesC REQUIRED)
 pkg_check_modules(MiniZip REQUIRED minizip)
 find_package(Zint REQUIRED)
@@ -61,7 +60,7 @@ if(WIN32)
 else()
 	set(PLATFORM_UTIL ${CMAKE_SOURCE_DIR}/src/unix/UnixFunc.cpp)
 endif()
-add_library(libDocxFactoryLib STATIC
+add_library(DocxFactoryLib STATIC
 	${CMAKE_SOURCE_DIR}/src/barcode/BarcodeFunc.cpp
 
 	${CMAKE_SOURCE_DIR}/src/console/ConsoleException.cpp
@@ -145,7 +144,7 @@ add_library(libDocxFactoryLib STATIC
 
 	${PLATFORM_UTIL}
 )
-target_link_libraries(libDocxFactoryLib
+target_link_libraries(DocxFactoryLib
 	${ICU_LIBRARIES}
 	${ZLIB_LIBRARIES}
 	${ImageMagick_LIBRARIES}
@@ -156,24 +155,24 @@ target_link_libraries(libDocxFactoryLib
 )
 
 
-add_library(libUnoUtil STATIC
+add_library(UnoUtil STATIC
 	${CMAKE_SOURCE_DIR}/src/UnoUtil/PropertyMap.cpp
 	${CMAKE_SOURCE_DIR}/src/UnoUtil/UnoException.cpp
 	${CMAKE_SOURCE_DIR}/src/UnoUtil/UnoUtilImpl.cpp
 )
-target_link_libraries(libUnoUtil
-	libDocxFactoryLib
+target_link_libraries(UnoUtil
+	DocxFactoryLib
 	${LIBREOFFICE_SDK_LIBRARIES}
 )
 if(UNIX)
 	# This macro was used by the LibreOffice SDK, but wasn't defined by GCC
-	target_compile_definitions(libUnoUtil PRIVATE LINUX)
+	target_compile_definitions(UnoUtil PRIVATE LINUX)
 endif()
 
 
 file(GLOB DOCXMERGER_SRC ${CMAKE_SOURCE_DIR}/src/DocxMerger/*.cpp)
 file(GLOB DOCXCOMPILER_SRC ${CMAKE_SOURCE_DIR}/src/DocxCompiler/*.cpp)
-add_library(libDocxFactory STATIC
+add_library(DocxFactory STATIC
 	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/ConversionNotSupportedException.cpp
 	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/ConverterPrinter.cpp
 	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/ConverterPrinterException.cpp
@@ -218,14 +217,14 @@ add_library(libDocxFactory STATIC
 	${CMAKE_SOURCE_DIR}/src/WordProcessingMerger/WordProcessingMerger.cpp
 	${CMAKE_SOURCE_DIR}/src/WordProcessingMerger/WordProcessingMerger.cpp
 ) 
-target_link_libraries(libDocxFactory
-	libDocxFactoryLib
-	libUnoUtil
+target_link_libraries(DocxFactory
+	DocxFactoryLib
+	UnoUtil
 )
 if(MSVC)
-	target_compile_options(libDocxFactory PRIVATE /permissive)
+	target_compile_options(DocxFactory PRIVATE /permissive)
 else()
-	target_compile_options(libDocxFactory PRIVATE -fpermissive)
+	target_compile_options(DocxFactory PRIVATE -fpermissive)
 endif()
 
 
@@ -233,7 +232,7 @@ add_executable(word-processing-compiler
 	${CMAKE_SOURCE_DIR}/src/WordProcessingCompiler/word-processing-compiler.cpp
 )
 target_link_libraries(word-processing-compiler
-	libDocxFactory
+	DocxFactory
 )
 if(CMAKE_DL_LIBS)
 	target_link_libraries(word-processing-compiler ${CMAKE_DL_LIBS})
@@ -244,7 +243,7 @@ add_executable(word-processing-merger
 	${CMAKE_SOURCE_DIR}/src/WordProcessingMerger/word-processing-merger.cpp
 )
 target_link_libraries(word-processing-merger
-	libDocxFactory
+	DocxFactory
 )
 if(CMAKE_DL_LIBS)
 	target_link_libraries(word-processing-merger ${CMAKE_DL_LIBS})
