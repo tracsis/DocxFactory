@@ -36,7 +36,7 @@
 		tar xzvf zint-2.8.0.tar.gz
 		cd zint-2.8.0
 		mkdir build && cd build
-		x86_64-w64-mingw32.static-cmake ..
+		x86_64-w64-mingw32.shared-cmake ..
 		cd backend
 		make
 		sudo make install
@@ -44,11 +44,9 @@
 5. Install LibreOffice SDK
 	Do this from Windows, not WSL
 	1. [Download and install LibreOffice and LibreOffice SDK for Windows](https://www.libreoffice.org/download/download/)
-	2. Open a PowerShell window as administrator (e.g. by right-clicking the Start button)
-	3. `cd` to your LibreOffice install directory (most likely `C:\Program Files\LibreOffice 6.4`)
-	4. Follow the steps in [this guide](https://studiofreya.com/2016/10/11/integrating-libreoffice-into-cpp/) to generate header files
-	5. Place the generated headers in `[libreoffice folder]\sdk\include_generated`
-	6. Copy the `sdk`-folder from LibreOffice into `DocxFactory/libs`
+	2. Follow the steps in [this guide](https://studiofreya.com/2016/10/11/integrating-libreoffice-into-cpp/) to generate header files
+	3. Place the generated headers in `[libreoffice folder]\sdk\include_generated`
+	4. Copy the `sdk`-folder from LibreOffice into `DocxFactory/libs`
 6. Build DocxFactory
 	```bash
 	git clone https://github.com/Eskildybvik/DocxFactory
