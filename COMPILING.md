@@ -2,8 +2,8 @@
 ---------------
 
 # Compiling for Windows from WSL
-0. Start by installing WSL, and a suitable distro (e.g. Ubuntu 18.04 LTS)
-1. Install [the M Cross Environment (MXE)](https://mxe.cc/) and required packages: 
+1. Start by installing WSL, and a suitable distro (e.g. Ubuntu 18.04 LTS)
+2. Install [the M Cross Environment (MXE)](https://mxe.cc/) and required packages: 
 	1. [Install dependencies for MXE](https://mxe.cc/#requirements)
 	2. Clone the repo: `git clone https://github.com/mxe/mxe.git`
 	3. To install MXE system-wide: 
@@ -14,21 +14,21 @@
 		```
 	4. Edit `MXE_TARGETS` in `/opt/mxe/settings.mk` to
 		```
-		MXE_TARGETS := x86_64-w64-mingw32.static
+		MXE_TARGETS := x86_64-w64-mingw32.shared
 		```
 	5. Build required packages: 
 		```bash
 		cd /opt/mxe
 		make -j8 cc boost imagemagick minizip zlib xerces icu4c cmake   # DocxFactory dependencies
 		```
-2. "Install" RapidJSON:
+3. "Install" RapidJSON:
 	```bash
 	cd ~
 	wget https://github.com/Tencent/rapidjson/archive/v1.1.0.tar.gz
 	tar xzvf v1.1.0.tar.gz
 	cp -r rapidjson-1.1.0/include/rapidjson /opt/mxe/usr/x86_64-w64-mingw32.static/include/rapidjson
 	```
-3. Build and install Zint: 
+4. Build and install Zint: 
 	1. [Download Zint 2.8.0 from SourceForge](https://sourceforge.net/projects/zint/files/zint/2.8.0/)
 	2. Build and install:
 		```bash
@@ -41,24 +41,51 @@
 		make
 		sudo make install
 		```
-4. Install LibreOffice SDK (WIP)
-	0. Do this from Windows, not WSL
+5. Install LibreOffice SDK
+	Do this from Windows, not WSL
 	1. [Download and install LibreOffice and LibreOffice SDK for Windows](https://www.libreoffice.org/download/download/)
 	2. Open a PowerShell window as administrator (e.g. by right-clicking the Start button)
 	3. `cd` to your LibreOffice install directory (most likely `C:\Program Files\LibreOffice 6.4`)
-	4. Generate additional header files: 
-		```ps
-		.\sdk\bin\cppumaker.exe -O ".\sdk\include_generated" ".\program\types.rdb" ".\program\types\oovbaapi.rdb" ".\program\types\offapi.rdb"
-		```
-	5. Copy the `sdk`-folder from LibreOffice into `DocxFactory/libs`
-5. Build DocxFactory
+	4. Follow the steps in [this guide](https://studiofreya.com/2016/10/11/integrating-libreoffice-into-cpp/) to generate header files
+	5. Place the generated headers in `[libreoffice folder]\sdk\include_generated`
+	6. Copy the `sdk`-folder from LibreOffice into `DocxFactory/libs`
+6. Build DocxFactory
 	```bash
 	git clone https://github.com/Eskildybvik/DocxFactory
 	cd DocxFactory
 	mkdir build && cd build
-	x86_64-w64-mingw32.static-cmake ..
+	x86_64-w64-mingw32.shared-cmake ..
 	make
 	```
+
+## Fixing errors when building for Windows from WSL
+### ImageMagick failed to build because Theora failed to build
+Only the examples appear to be broken, so let's replace them with a minimal C++ program to avoid having to edit the makefile.
+```bash
+cd /opt/mxe
+mkdir buildlocal
+cp pkg/libtheora-1.1.1.tar.gz buildlocal/
+cd buildlocal
+tar xzvf libtheora-1.1.1.tar.gz
+cd libtheora-1.1.1/examples/
+echo "int main(){return 0;}" > encoder_example.c
+echo "int main(){return 0;}" > png2theora.c
+cd /opt/mxe
+make theora theora_SOURCE_TREE=/opt/mxe/buildlocal/libtheora-1.1.1
+make imagemagick
+```
+
+### magick/image.h not found
+`sudo cp -r /opt/mxe/usr/x86_64-w64-mingw32.shared/include/ImageMagick-7/MagickCore /opt/mxe/usr/x86_64-w64-mingw32.shared/include/ImageMagick-7/magick`
+
+### Xerces failed to build
+Open the Xerces makefile: `nano /opt/mxe/src/xerces.mk`
+Remove the following lines: 
+- `--enable-netaccessor-curl \`
+- `--disable-shared \`
+
+
+
 
 # Compiling for Linux
 These instructions assume you're running Ubuntu or a derivative.
