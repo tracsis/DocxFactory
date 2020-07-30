@@ -1,6 +1,6 @@
 
-#ifndef __DOCXFACTORY_H__
-#define __DOCXFACTORY_H__
+#ifndef __DOCXFACTORY_DFW_H__
+#define __DOCXFACTORY_DFW_H__
 
 #include <wchar.h>
 

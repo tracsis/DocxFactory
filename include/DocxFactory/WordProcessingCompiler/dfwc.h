@@ -1,6 +1,6 @@
 
-#ifndef __DOCXFACTORY_H__
-#define __DOCXFACTORY_H__
+#ifndef __DOCXFACTORY_DFWC_H__
+#define __DOCXFACTORY_DFWC_H__
 
 
 

@@ -6,10 +6,13 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 
 find_package(PkgConfig REQUIRED)
-find_package(ICU REQUIRED i18n io le lx uc)
+# find_package(ICU COMPONENTS i18n io le lx uc)
+pkg_check_modules(ICUi18n REQUIRED icu-i18n)
+pkg_check_modules(ICUio REQUIRED icu-io)
+pkg_check_modules(ICUuc REQUIRED icu-uc)
 find_package(Boost REQUIRED)
 find_package(ZLIB REQUIRED)
-find_package(ImageMagick REQUIRED Magick++)
+find_package(ImageMagick REQUIRED Magick++ MagickWand MagickCore)
 find_package(XercesC REQUIRED)
 pkg_check_modules(MiniZip REQUIRED minizip)
 find_package(Zint REQUIRED)
@@ -43,11 +46,15 @@ endif()
 
 include_directories(
 	${CMAKE_SOURCE_DIR}/include
-	${ICU_INCLUDE_DIRS}
+	${ICUi18n_INCLUDE_DIRS}
+	${ICUio_INCLUDE_DIRS}
+	${ICUuc_INCLUDE_DIRS}
 	${BOOST_INCLUDE_DIRS}
 	${ZLIB_INCLUDE_DIRS}
 	${ImageMagick_INCLUDE_DIRS}
 	${ImageMagick_Magick++_INCLUDE_DIRS}
+	${ImageMagick_MagickWand_INCLUDE_DIRS}
+	${ImageMagick_MagickCore_INCLUDE_DIRS}
 	${XercesC_INCLUDE_DIRS}
 	${MiniZip_INCLUDE_DIRS}
 	${ZINT_INCLUDE_DIR}
@@ -110,6 +117,8 @@ add_library(DocxFactoryLib STATIC
 
 	${CMAKE_SOURCE_DIR}/src/str/StrEntries.cpp
 	${CMAKE_SOURCE_DIR}/src/str/StrFunc.cpp
+
+	${PLATFORM_UTIL}
 	
 	${CMAKE_SOURCE_DIR}/src/time/TimeFunc.cpp
 	
@@ -141,18 +150,23 @@ add_library(DocxFactoryLib STATIC
 	${CMAKE_SOURCE_DIR}/src/zip/ZipFunc.cpp
 	${CMAKE_SOURCE_DIR}/src/zip/ZipStreamNotOpenException.cpp
 	${CMAKE_SOURCE_DIR}/src/zip/ZipStreamOpenException.cpp
-
-	${PLATFORM_UTIL}
 )
 target_link_libraries(DocxFactoryLib
-	${ICU_LIBRARIES}
+	${ICUi18n_LIBRARIES}
+	${ICUio_LIBRARIES}
+	${ICUuc_LIBRARIES}
 	${ZLIB_LIBRARIES}
 	${ImageMagick_LIBRARIES}
 	${ImageMagick_Magick++_LIBRARIES}
+	${ImageMagick_MagickCore_LIBRARIES}
+	${ImageMagick_MagickWand_LIBRARIES}
 	${XercesC_LIBRARIES}
 	${MiniZip_LIBRARIES}
 	${ZINT_LIBRARIES}
 )
+if(WIN32)
+	target_link_libraries(DocxFactoryLib version)
+endif(WIN32)
 
 
 add_library(UnoUtil STATIC
@@ -167,20 +181,21 @@ target_link_libraries(UnoUtil
 if(UNIX)
 	# This macro was used by the LibreOffice SDK, but wasn't defined by GCC
 	target_compile_definitions(UnoUtil PRIVATE LINUX)
+else()
+	target_compile_definitions(UnoUtil PRIVATE "_WIN32")
+	target_compile_definitions(UnoUtil PRIVATE "_MSC_VER")
 endif()
 
 
-file(GLOB DOCXMERGER_SRC ${CMAKE_SOURCE_DIR}/src/DocxMerger/*.cpp)
-file(GLOB DOCXCOMPILER_SRC ${CMAKE_SOURCE_DIR}/src/DocxCompiler/*.cpp)
-add_library(DocxFactory STATIC
+add_library(DocxFactory SHARED
 	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/ConversionNotSupportedException.cpp
 	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/ConverterPrinter.cpp
 	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/ConverterPrinterException.cpp
 	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/ExportFormatNotSupportedException.cpp
 	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/GradeGroup.cpp
-	# ${CMAKE_SOURCE_DIR}/src/ConverterPrinter/MsExcelUtil.cpp
-	# ${CMAKE_SOURCE_DIR}/src/ConverterPrinter/MsOfficeUtil.cpp
-	# ${CMAKE_SOURCE_DIR}/src/ConverterPrinter/MsWordUtil.cpp
+	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/MsExcelUtil.cpp
+	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/MsOfficeUtil.cpp
+	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/MsWordUtil.cpp
 	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/OdfConverterUtil.cpp
 	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/OleException.cpp
 	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/OpenOfficeUtil.cpp
@@ -201,22 +216,93 @@ add_library(DocxFactory STATIC
 	${CMAKE_SOURCE_DIR}/src/opc/PartNotFoundException.cpp
 	${CMAKE_SOURCE_DIR}/src/opc/PartTypeNotFoundException.cpp
 
-	${DOCXMERGER_SRC}
+	${CMAKE_SOURCE_DIR}/src/DocxCompiler/DocxCompilerAltChunkField.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxCompiler/DocxCompilerChartFieldXYSize.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxCompiler/DocxCompilerNumberField.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxCompiler/DocxCompilerBarcodeField.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxCompiler/DocxCompilerDateTimeField.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxCompiler/DocxCompilerPicField.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxCompiler/DocxCompilerBookmark.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxCompiler/DocxCompilerField.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxCompiler/DocxCompilerSettingsFile.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxCompiler/DocxCompilerBooleanField.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxCompiler/DocxCompilerFile.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxCompiler/DocxCompilerStyle.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxCompiler/DocxCompilerChartField.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxCompiler/DocxCompilerId.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxCompiler/DocxCompilerStyleFile.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxCompiler/DocxCompilerChartFieldFixedSeries.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxCompiler/DocxCompilerItem.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxCompiler/DocxCompilerTableStyle.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxCompiler/DocxCompilerChartFieldSeries.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxCompiler/DocxCompilerItemFile.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxCompiler/DocxCompilerTextField.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxCompiler/DocxCompilerChartFieldSingleSeries.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxCompiler/DocxCompilerItemGroup.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxCompiler/DocxCompilerXmlString.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxCompiler/DocxCompilerChartFieldXY.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxCompiler/DocxCompilerItemLayout.cpp
 
-	${DOCXCOMPILER_SRC}
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerAltChunkField.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerPasteBarcodeField.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerBarcodeField.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerPasteBooleanField.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerBooleanField.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerPasteChartAxis.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerChartAxis.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerPasteChartAxisDateTime.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerChartAxisDateTime.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerPasteChartAxisNumber.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerChartAxisNumber.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerPasteChartAxisText.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerChartAxisText.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerPasteChartField.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerChartField.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerPasteChartFieldFixedSeries.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerChartFieldFixedSeries.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerPasteChartFieldSeries.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerChartFieldSeries.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerPasteChartFieldSingleSeries.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerChartFieldSingleSeries.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerPasteChartFieldXY.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerChartFieldXY.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerPasteChartFieldXYSize.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerChartFieldXYSize.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerPasteChartValues.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerChartValues.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerPasteDateTimeField.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerDateTimeField.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerPasteField.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerException.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerPasteFieldGroup.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerField.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerPasteItem.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerFile.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerPasteItemGroup.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerId.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerPasteNumberField.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerItem.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerPastePicField.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerItemFile.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerPasteTextField.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerItemGroup.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerPicField.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerItemLayout.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerSettingsFile.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerNumberField.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerTextField.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerPasteAltChunkField.cpp
+	${CMAKE_SOURCE_DIR}/src/DocxMerger/DocxMergerXmlString.cpp
 
 	${CMAKE_SOURCE_DIR}/src/WordProcessingCompiler/dfwc.cpp
-	${CMAKE_SOURCE_DIR}/src/WordProcessingCompiler/WordProcessingCompiler.cpp
-
+	
 	${CMAKE_SOURCE_DIR}/src/WordProcessingMerger/CompileVersionMismatchException.cpp
 	${CMAKE_SOURCE_DIR}/src/WordProcessingMerger/dfw.cpp
 	${CMAKE_SOURCE_DIR}/src/WordProcessingMerger/InvalidItemNameException.cpp
 	${CMAKE_SOURCE_DIR}/src/WordProcessingMerger/InvalidMergeDataException.cpp
 	${CMAKE_SOURCE_DIR}/src/WordProcessingMerger/TemplateNotLoadedException.cpp
-	${CMAKE_SOURCE_DIR}/src/WordProcessingMerger/WordProcessingException.cpp
-	${CMAKE_SOURCE_DIR}/src/WordProcessingMerger/WordProcessingMerger.cpp
-	${CMAKE_SOURCE_DIR}/src/WordProcessingMerger/WordProcessingMerger.cpp
-) 
+	${CMAKE_SOURCE_DIR}/src/WordProcessingMerger/WordProcessingException.cpp	
+)
 target_link_libraries(DocxFactory
 	DocxFactoryLib
 	UnoUtil
@@ -226,10 +312,14 @@ if(MSVC)
 else()
 	target_compile_options(DocxFactory PRIVATE -fpermissive)
 endif()
+if(CMAKE_DL_LIBS)
+	target_link_libraries(DocxFactory ${CMAKE_DL_LIBS})
+endif(CMAKE_DL_LIBS)
 
 
 add_executable(word-processing-compiler
 	${CMAKE_SOURCE_DIR}/src/WordProcessingCompiler/word-processing-compiler.cpp
+	${CMAKE_SOURCE_DIR}/src/WordProcessingCompiler/WordProcessingCompiler.cpp
 )
 target_link_libraries(word-processing-compiler
 	DocxFactory
@@ -241,6 +331,7 @@ endif(CMAKE_DL_LIBS)
 
 add_executable(word-processing-merger
 	${CMAKE_SOURCE_DIR}/src/WordProcessingMerger/word-processing-merger.cpp
+	${CMAKE_SOURCE_DIR}/src/WordProcessingMerger/WordProcessingMerger.cpp
 )
 target_link_libraries(word-processing-merger
 	DocxFactory

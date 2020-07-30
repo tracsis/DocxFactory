@@ -8,7 +8,7 @@
 #include "DocxFactory/win/WinFunc.h"
 #include "DocxFactory/str/StrFunc.h"
 
-#include <ShlObj.h>
+#include <shlobj.h>
 
 using namespace DocxFactory;
 using namespace std;

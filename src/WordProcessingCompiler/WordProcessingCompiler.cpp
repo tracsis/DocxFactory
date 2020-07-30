@@ -1,7 +1,7 @@
 
+#include "DocxFactory/WordProcessingCompiler/dfwc.h"
 #include "DocxFactory/WordProcessingCompiler/WordProcessingCompiler.h"
 
-#include "DocxFactory/WordProcessingCompiler/dfwc.h"
 
 #include <stdexcept>
 
