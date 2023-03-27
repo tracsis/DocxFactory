@@ -17,32 +17,6 @@ find_package(XercesC REQUIRED)
 pkg_check_modules(MiniZip REQUIRED minizip)
 find_package(Zint REQUIRED)
 
-if(NOT LIBREOFFICE_SDK_PATH)
-	if(WIN32)
-		set(LIBREOFFICE_SDK_PATH ${CMAKE_SOURCE_DIR}/libs/sdk)
-	else()
-		set(LIBREOFFICE_SDK_PATH "/opt/libreoffice6.4/sdk")	
-	endif()
-endif(NOT LIBREOFFICE_SDK_PATH)
-
-set(LIBREOFFICE_SDK_INCLUDE_DIRS ${LIBREOFFICE_SDK_PATH}/include_generated ${LIBREOFFICE_SDK_PATH}/include)
-set(LIBREOFFICE_SDK_LIB_DIRS ${LIBREOFFICE_SDK_PATH}/lib)
-if(WIN32)
-	set(LIBREOFFICE_SDK_LIBRARIES
-		${LIBREOFFICE_SDK_LIB_DIRS}/icppu.lib
-		${LIBREOFFICE_SDK_LIB_DIRS}/icppuhelper.lib
-		${LIBREOFFICE_SDK_LIB_DIRS}/isal.lib
-		${LIBREOFFICE_SDK_LIB_DIRS}/isalhelper.lib
-	)
-else()
-	set(LIBREOFFICE_SDK_LIBRARIES
-		${LIBREOFFICE_SDK_LIB_DIRS}/libuno_cppu.so
-		${LIBREOFFICE_SDK_LIB_DIRS}/libuno_cppuhelpergcc3.so
-		${LIBREOFFICE_SDK_LIB_DIRS}/libuno_sal.so
-		${LIBREOFFICE_SDK_LIB_DIRS}/libuno_salhelpergcc3.so
-	)
-endif()
-
 
 include_directories(
 	${CMAKE_SOURCE_DIR}/include
@@ -58,7 +32,6 @@ include_directories(
 	${XercesC_INCLUDE_DIRS}
 	${MiniZip_INCLUDE_DIRS}
 	${ZINT_INCLUDE_DIR}
-	${LIBREOFFICE_SDK_INCLUDE_DIRS}
 )
 
 
@@ -169,22 +142,9 @@ if(WIN32)
 endif(WIN32)
 
 
-add_library(UnoUtil STATIC
-	${CMAKE_SOURCE_DIR}/src/UnoUtil/PropertyMap.cpp
-	${CMAKE_SOURCE_DIR}/src/UnoUtil/UnoException.cpp
-	${CMAKE_SOURCE_DIR}/src/UnoUtil/UnoUtilImpl.cpp
-)
-target_link_libraries(UnoUtil
+target_link_libraries(
 	DocxFactoryLib
-	${LIBREOFFICE_SDK_LIBRARIES}
 )
-if(UNIX)
-	# This macro was used by the LibreOffice SDK, but wasn't defined by GCC
-	target_compile_definitions(UnoUtil PRIVATE LINUX)
-else()
-	target_compile_definitions(UnoUtil PRIVATE "_WIN32")
-	target_compile_definitions(UnoUtil PRIVATE "_MSC_VER")
-endif()
 
 
 add_library(DocxFactory SHARED
@@ -305,7 +265,6 @@ add_library(DocxFactory SHARED
 )
 target_link_libraries(DocxFactory
 	DocxFactoryLib
-	UnoUtil
 )
 if(MSVC)
 	target_compile_options(DocxFactory PRIVATE /permissive)
