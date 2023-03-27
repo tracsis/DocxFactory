@@ -20,6 +20,7 @@ find_package(Zint REQUIRED)
 
 include_directories(
 	${CMAKE_SOURCE_DIR}/include
+	${CMAKE_SOURCE_DIR}/rapidjson/include
 	${ICUi18n_INCLUDE_DIRS}
 	${ICUio_INCLUDE_DIRS}
 	${ICUuc_INCLUDE_DIRS}
