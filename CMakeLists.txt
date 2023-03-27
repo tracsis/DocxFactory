@@ -15,7 +15,6 @@ find_package(ZLIB REQUIRED)
 find_package(ImageMagick REQUIRED Magick++ MagickWand MagickCore)
 find_package(XercesC REQUIRED)
 pkg_check_modules(MiniZip REQUIRED minizip)
-find_package(Zint REQUIRED)
 
 
 include_directories(
@@ -32,7 +31,6 @@ include_directories(
 	${ImageMagick_MagickCore_INCLUDE_DIRS}
 	${XercesC_INCLUDE_DIRS}
 	${MiniZip_INCLUDE_DIRS}
-	${ZINT_INCLUDE_DIR}
 )
 
 
@@ -136,7 +134,6 @@ target_link_libraries(DocxFactoryLib
 	${ImageMagick_MagickWand_LIBRARIES}
 	${XercesC_LIBRARIES}
 	${MiniZip_LIBRARIES}
-	${ZINT_LIBRARIES}
 )
 if(WIN32)
 	target_link_libraries(DocxFactoryLib version)
