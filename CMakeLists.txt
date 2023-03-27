@@ -148,20 +148,6 @@ target_link_libraries(
 
 
 add_library(DocxFactory SHARED
-	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/ConversionNotSupportedException.cpp
-	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/ConverterPrinter.cpp
-	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/ConverterPrinterException.cpp
-	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/ExportFormatNotSupportedException.cpp
-	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/GradeGroup.cpp
-	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/MsExcelUtil.cpp
-	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/MsOfficeUtil.cpp
-	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/MsWordUtil.cpp
-	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/OdfConverterUtil.cpp
-	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/OleException.cpp
-	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/OpenOfficeUtil.cpp
-	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/PrintingNotSupportedException.cpp
-	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/UtilFailedException.cpp
-	${CMAKE_SOURCE_DIR}/src/ConverterPrinter/UtilNotFoundException.cpp
 
 	${CMAKE_SOURCE_DIR}/src/opc/ContentTypeNotFound.cpp
 	${CMAKE_SOURCE_DIR}/src/opc/OpcContentTypes.cpp
