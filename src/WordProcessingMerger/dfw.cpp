@@ -8,7 +8,6 @@
 
 #include "DocxFactory/DocxMerger/DocxMergerFile.h"
 #include "DocxFactory/DocxMerger/DocxMergerItem.h"
-#include "DocxFactory/ConverterPrinter/ConverterPrinter.h"
 
 #include "DocxFactory/xml/XmlFunc.h"
 #include "DocxFactory/xml/DomException.h"
@@ -64,7 +63,6 @@ void dfw_initialize()
 	dfw_errorWhere			= "";
 	dfw_errorFlag			= false;
 
-	ConverterPrinter::setUpdateToc( dfw_updateTocMethod > 0 );
 } // dfw_initialize
 
 void dfw_destroy()
@@ -201,18 +199,6 @@ void dfw_save( const char* p_fileName )
 			{
 				dfw_docxMergerFile ->save( l_fileName,
 					dfw_docxMergerFile ->hasToc() && dfw_updateTocMethod == 1 );
-
-				if( dfw_docxMergerFile ->hasToc() && dfw_updateTocMethod == 2 )
-					ConverterPrinter::getInstance().saveAs( l_fileName, l_fileName );
-			}
-
-			else
-			{
-				l_tempFile = OsFunc::getTempFile( ".docx" );
-				dfw_docxMergerFile ->save( l_tempFile );
-
-				ConverterPrinter::getInstance().saveAs( l_tempFile, l_fileName );
-				OsFunc::remove( l_tempFile );
 			}
 
 			dfw_destroy();
@@ -254,12 +240,6 @@ void dfw_print( const char* p_printerName, unsigned short p_copyCnt )
 		{
 			if ( !dfw_docxMergerFile )
 				throw TemplateNotLoadedException( __FILE__, __LINE__ );
-
-			l_tempFile = OsFunc::getTempFile( ".docx" );
-			dfw_docxMergerFile ->save( l_tempFile );
-
-			ConverterPrinter::getInstance().print( l_tempFile, p_printerName, p_copyCnt );
-			OsFunc::remove( l_tempFile );
 
 			dfw_destroy();
 		}
@@ -666,7 +646,6 @@ void dfw_setUpdateTocMethod( unsigned char p_method )
 
 	dfw_updateTocMethod = p_method;
 
-	ConverterPrinter::setUpdateToc( dfw_updateTocMethod > 0 );
 } // dfw_setUpdateTocMethod
 
 unsigned char dfw_getUpdateTocMethod()
