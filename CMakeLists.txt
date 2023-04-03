@@ -283,3 +283,5 @@ target_link_libraries(word-processing-merger
 if(CMAKE_DL_LIBS)
 	target_link_libraries(word-processing-merger ${CMAKE_DL_LIBS})
 endif(CMAKE_DL_LIBS)
+
+install(TARGETS word-processing-compiler word-processing-merger DocxFactory DocxFactoryLib)
