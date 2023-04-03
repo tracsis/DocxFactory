@@ -3043,8 +3043,8 @@ namespace swig {
 }
 
 
-#include "WordProcessingCompiler.h"
-#include "WordProcessingMerger.h"
+#include "WordProcessingCompiler/WordProcessingCompiler.h"
+#include "WordProcessingMerger/WordProcessingMerger.h"
 #include <exception>
 
 

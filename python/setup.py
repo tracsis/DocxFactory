@@ -6,8 +6,7 @@ import platform
 ext_module = Extension(
 	"_docxfactory",
 	sources			= ["DocxFactory_wrap.cxx", "../src/WordProcessingCompiler/WordProcessingCompiler.cpp", "../src/WordProcessingMerger/WordProcessingMerger.cpp"],
-	include_dirs	= ["../include"],
-	library_dirs	= ["../lib"],
+	include_dirs	= ["../include", "../include/DocxFactory"],
 	libraries		= ["DocxFactory"])
 
 setup(
