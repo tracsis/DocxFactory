@@ -1,0 +1,25 @@
+name: Main
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    name: Build
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install apt packages
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install cmake ninja-build libboost-dev libmagick++-dev libminizip-dev zlib1g-dev libxerces-c-dev libicu-dev
+
+      - name: Build
+        run: |
+          cmake -B build -G Ninja
+          cmake --build build
