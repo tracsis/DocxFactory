@@ -12,19 +12,13 @@ from sys import version_info
 if version_info >= (2, 6, 0):
     def swig_import_helper():
         from os.path import dirname
-        import imp
-        fp = None
+        import importlib.util
         try:
-            fp, pathname, description = imp.find_module('_docxfactory', [dirname(__file__)])
+            docxfactory_spec = importlib.util.find_spec('_docxfactory')
+            return docxfactory_spec.loader.load_module()
         except ImportError:
             import _docxfactory
             return _docxfactory
-        if fp is not None:
-            try:
-                _mod = imp.load_module('_docxfactory', fp, pathname, description)
-            finally:
-                fp.close()
-            return _mod
     _docxfactory = swig_import_helper()
     del swig_import_helper
 else:
